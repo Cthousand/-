@@ -41,39 +41,39 @@ url:https://spa1.scrape.center/
 
 ## 4. 实践过程遇到的障碍
 
-1. aiohttp方法中,
+### 1. aiohttp方法中,
 
    ```python
    collection= AsyncIOMotorClient('mongodb://localhost:27017')[mongo_db_name][mongo_collection_name] 
    ```
 
-   报错:显示port应为int之类,如何解决?
+报错:显示port应为int之类,如何解决?
 
-   解决方法:查阅官方文档,好像要用这种方式传递
+解决方法:查阅官方文档,好像要用这种方式传递
 
-   <img src="/Users/qc/Library/Application Support/typora-user-images/image-20220406013306059.png" alt="image-20220406013306059" style="zoom:50%;" />
+<img src="/Users/qc/Library/Application Support/typora-user-images/image-20220406013306059.png" alt="image-20220406013306059" style="zoom:50%;" />
 
-   于是改成了:
+于是改成了:
 
    ```python
    collection= AsyncIOMotorClient('localhost',27017)[mongo_db_name][mongo_collection_name] 
    ```
 
-   果然解决了问题.
+果然解决了问题.
 
-2. 在pyppeteer方法中,自带的chromium浏览器一打开显示缺少api什么的,总是崩溃,如何解决?
+### 2. 在pyppeteer方法中,自带的chromium浏览器一打开显示缺少api什么的,总是崩溃,如何解决?
 
-   解决方法:`browser = await launch(filename='userdata',executablePath='/Applications/Google Chrome.app/Contents/MacOS/Google Chrome',headless=False,args=['--disable-infobars']) `
+解决方法:`browser = await launch(filename='userdata',executablePath='/Applications/Google Chrome.app/Contents/MacOS/Google Chrome',headless=False,args=['--disable-infobars']) `
 
-   在参数executablePath传递进你的chrome浏览器执行文件窗口
+在参数executablePath传递进你的chrome浏览器执行文件窗口
 
-   官方文档网址:https://pyppeteer.github.io/pyppeteer/reference.html#launcher
+官方文档网址:https://pyppeteer.github.io/pyppeteer/reference.html#launcher
 
-   <img src="/Users/qc/Library/Application Support/typora-user-images/image-20220406015241099.png" alt="image-20220406015241099" style="zoom: 50%;" />
+ <img src="/Users/qc/Library/Application Support/typora-user-images/image-20220406015241099.png" alt="image-20220406015241099" style="zoom: 50%;" />
 
    
 
-3. 在pyppeteer方法中,采用querySelectorallEval方法选取并提取节点文本时,css选择器对于某些节点不如xpath方便,如何绕过这个方法?
+### 3. 在pyppeteer方法中,采用querySelectorallEval方法选取并提取节点文本时,css选择器对于某些节点不如xpath方便,如何绕过这个方法?
 
 <img src="/Users/qc/Library/Application Support/typora-user-images/image-20220406020128547.png" alt="image-20220406020128547" style="zoom:50%;" />
 
