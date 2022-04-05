@@ -1,3 +1,4 @@
+#! python3
 import requests
 import time 
 import logging 
