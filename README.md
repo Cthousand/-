@@ -2,19 +2,19 @@
 
 ## 1. 四种方式
 
-​	[requests,aiohttp,selenium,pyppeteer],这四种方法的主要区分点:
+[requests,aiohttp,selenium,pyppeteer],这四种方法的主要区分点:
 
 1. requests和aiohttp属于抓包,selenium和pyppeteer属于js渲染提取.抓包会更快一点,因为抓包省去了浏览器页面渲染的过程.
 
 2. requsts和selenium属于同步,aiohttp和pyppeteer属于异步.异步会更快一点,异步和同步这2种方式,打个比方同步就像是一个人必要要烧完水才能够打少卫生,而异步就像是先让水烧着,但这时候去打扫卫生,等水烧好了,再切换回来,所以后者能够更多的运行人的性能.
 
-   所以理论上,这四种方式的排名顺序是:
+所以理论上,这四种方式的排名顺序是:
 
-   aiohttp>requests>pyppeteer>selenium
+aiohttp>requests>pyppeteer>selenium
 
 ## 2. 最终结果
 
-​		aiohttp>requests>selenium>pyppeteer
+aiohttp>requests>selenium>pyppeteer
 
 | 方式      | 耗时/s |
 | --------- | ------ |
@@ -77,7 +77,7 @@ url:https://spa1.scrape.center/
 
 <img src="/Users/qc/Library/Application Support/typora-user-images/image-20220406020128547.png" alt="image-20220406020128547" style="zoom:50%;" />
 
-​	这里采用xpath选择器,注意其返回的是一个列表,然后用evaluate方法传入js语言提取.
+这里采用xpath选择器,注意其返回的是一个列表,然后用evaluate方法传入js语言提取.
 
 ```python
 urls_node=await tab.Jx('//h2[@class="m-b-sm"]/parent::*') # xpath选择,返回的是一个列表
@@ -92,5 +92,5 @@ for url_node in urls_node:
 
 ## 5. 感言
 
-​	事实上,我在实践的过程中遇到的困难其实并不止这些,但最终只能记住印象深刻的,对于已经理解消化的障碍仿佛遗忘了它们,后面可能对针对多线程和多进程再做一个项目练习,比较这两种方式在速度上的差异.这是我的第一篇项目复盘,希望能开个好头,坚持下去,用输出倒逼输入,做到真正的理解消化.
+事实上,我在实践的过程中遇到的困难其实并不止这些,但最终只能记住印象深刻的,对于已经理解消化的障碍仿佛遗忘了它们,后面可能对针对多线程和多进程再做一个项目练习,比较这两种方式在速度上的差异.这是我的第一篇项目复盘,希望能开个好头,坚持下去,用输出倒逼输入,做到真正的理解消化.
 
