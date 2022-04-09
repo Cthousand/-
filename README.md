@@ -1,96 +1,67 @@
-# 四种方式爬取同一网站的速度差异
+# 项目1.电影网站的爬取
 
-## 1. 四种方式
+***
 
-[requests,aiohttp,selenium,pyppeteer],这四种方法的主要区分点:
+## 目标: 分别采用requests，aiohttp，https，selenium，pyppeteer等5种方式爬取目标网址的电影数据，包括标题，评分和简介。
 
-1. requests和aiohttp属于抓包,selenium和pyppeteer属于js渲染提取.抓包会更快一点,因为抓包省去了浏览器页面渲染的过程.
+### 目标网址: https://spa1.scrape.center/
 
-2. requsts和selenium属于同步,aiohttp和pyppeteer属于异步.异步会更快一点,异步和同步这2种方式,打个比方同步就像是一个人必要要烧完水才能够打少卫生,而异步就像是先让水烧着,但这时候去打扫卫生,等水烧好了,再切换回来,所以后者能够更多的运行人的性能.
+### 数据结构如下:
 
-所以理论上,这四种方式的排名顺序是:
+ <img src="https://cthousand-pic-save.oss-cn-hangzhou.aliyuncs.com/img/202204100244113.png" style="zoom:50%;" />
 
-aiohttp>requests>pyppeteer>selenium
+---
 
-## 2. 最终结果
+## 方法分析:
 
-aiohttp>requests>selenium>pyppeteer
+### 网页分析
 
-| 方式      | 耗时/s |
-| --------- | ------ |
-| aiohttp   | 56     |
-| requests  | 130    |
-| selenium  | 179    |
-| pyppeteer | 200    |
+1. 首先分析网页类型， 这是典型的列表页+详情页的结构。
+2. 打开初始网页，打开开发者工具， 切换到network下， 观察最先加载的html文档， 打开预览， 发现没有数据， 说明数据可能是通过javescript渲染得到的;打开XHR， 果然找到了一个ajax请求。
+3. 观察这个请求，url结构有规律，且没有加密，那么列表页的数据基本上没有障碍了。
+4. 然后分析详情页， 点开列表中的链接， network中发现了对应的ajax请求， 查看url结构， 也是没有加密的， 那么详情页也没有障碍了。
+5. 在方法选择上， 采用aiohttp异步爬取是较为高效的， 为了加深对于不同爬虫方法的理解， 逐一尝试， 储存方式采用Mongodb。
 
-## 3. 测试方法
+### 脚本结构 
 
-url:https://spa1.scrape.center/
+ <img src="https://cthousand-pic-save.oss-cn-hangzhou.aliyuncs.com/img/202204100245798.png" style="zoom:50%;" />
 
-<img src="/Users/qc/Library/Application Support/typora-user-images/image-20220406010105630.png" alt="image-20220406010105630" style="zoom: 33%;" />
+大体上，主要是建立了7个方法， 以降低代码的耦合度， 也利于调试和维护。
 
-点击第一个
+## 代码实现
 
-<img src="/Users/qc/Library/Application Support/typora-user-images/image-20220406010232442.png" alt="image-20220406010232442" style="zoom: 33%;" />
+主体代码见同级目录下的py文件，命名方式是方法名。
 
-要保存的数据就是每一部电影的标题,评分和简介这三块内容
+### 已解决的问题
 
-大体思路如下:
+Q1:Httpx.py中请求详情页时显示301返回状态。
 
-![image-20220406010909110](/Users/qc/Library/Application Support/typora-user-images/image-20220406010909110.png)
+ <img src="https://cthousand-pic-save.oss-cn-hangzhou.aliyuncs.com/img/202204100339926.png" alt="iShot2022-04-10 03.38.21" style="zoom:50%;" />
 
-## 4. 实践过程遇到的障碍
-
-### 1. aiohttp方法中,
-
-   ```python
-   collection= AsyncIOMotorClient('mongodb://localhost:27017')[mongo_db_name][mongo_collection_name] 
-   ```
-
-报错:显示port应为int之类,如何解决?
-
-解决方法:查阅官方文档,好像要用这种方式传递
-
-<img src="/Users/qc/Library/Application Support/typora-user-images/image-20220406013306059.png" alt="image-20220406013306059" style="zoom:50%;" />
-
-于是改成了:
-
-   ```python
-   collection= AsyncIOMotorClient('localhost',27017)[mongo_db_name][mongo_collection_name] 
-   ```
-
-果然解决了问题.
-
-### 2. 在pyppeteer方法中,自带的chromium浏览器一打开显示缺少api什么的,总是崩溃,如何解决?
-
-解决方法:`browser = await launch(filename='userdata',executablePath='/Applications/Google Chrome.app/Contents/MacOS/Google Chrome',headless=False,args=['--disable-infobars']) `
-
-在参数executablePath传递进你的chrome浏览器执行文件窗口
-
-官方文档网址:https://pyppeteer.github.io/pyppeteer/reference.html#launcher
-
- <img src="/Users/qc/Library/Application Support/typora-user-images/image-20220406015241099.png" alt="image-20220406015241099" style="zoom: 50%;" />
-
-   
-
-### 3. 在pyppeteer方法中,采用querySelectorallEval方法选取并提取节点文本时,css选择器对于某些节点不如xpath方便,如何绕过这个方法?
-
-<img src="/Users/qc/Library/Application Support/typora-user-images/image-20220406020128547.png" alt="image-20220406020128547" style="zoom:50%;" />
-
-这里采用xpath选择器,注意其返回的是一个列表,然后用evaluate方法传入js语言提取.
+A1:httpx默认不开启重定向，需要手动打开，参数为'follow_redirects'
 
 ```python
-urls_node=await tab.Jx('//h2[@class="m-b-sm"]/parent::*') # xpath选择,返回的是一个列表
-urls=[]
-for url_node in urls_node:
-  url = await tab.evaluate('node => node.href', url_node) # js语言提取链接,此处返回的是全链接,无需拼接,挺特别的
-  urls.append(url)
-  return urls
+def Common_json(url):  
+    with httpx.Client() as client: 
+        r=client.get(url,headers=headers,follow_redirects=True) # 没有follow_redirects 则显示301报错,网页被永久移除,于是开启了重定向，但很容易定向到一些广告之类的网址。
+        return r.json()
 ```
 
-理论上,返回的应该是上图中标红的,实测返回的是全链接(不知道有没有大佬能解释一下?)
+以下是官网解释：https://www.python-httpx.org/compatibility/
 
-## 5. 感言
+ <img src="https://cthousand-pic-save.oss-cn-hangzhou.aliyuncs.com/img/202204100344019.png" alt="image-20220410034417957" style="zoom:50%;" />
 
-事实上,我在实践的过程中遇到的困难其实并不止这些,但最终只能记住印象深刻的,对于已经理解消化的障碍仿佛遗忘了它们,后面可能对针对多线程和多进程再做一个项目练习,比较这两种方式在速度上的差异.这是我的第一篇项目复盘,希望能开个好头,坚持下去,用输出倒逼输入,做到真正的理解消化.
+### 尚存在的问题
+
+Q1:pyppeteer.py中浏览器无法隐藏提示条。
+
+```python
+async def Init():   # 此处没有用内置的的chromium
+    global browser, tab
+    browser = await launch(filename='userdata',executablePath='/Applications/Google Chrome.app/Contents/MacOS/Google Chrome',headless=False,
+                           args=['--disable-infobars'])  # --disable-infobars隐藏提示条,但实测下来没有用,可能是因为指定了浏览器,自带的chromium则没有这个问题，但很容易崩溃。
+```
+
+Q2:Httpx.py中开启了重定向之后，会定向到一些广告页面。
+
 
