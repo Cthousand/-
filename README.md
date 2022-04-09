@@ -62,7 +62,3 @@ async def Init():   # 此处没有用内置的的chromium
     browser = await launch(filename='userdata',executablePath='/Applications/Google Chrome.app/Contents/MacOS/Google Chrome',headless=False,
                            args=['--disable-infobars'])  # --disable-infobars隐藏提示条,但实测下来没有用,可能是因为指定了浏览器,自带的chromium则没有这个问题，但很容易崩溃。
 ```
-
-Q2:Httpx.py中开启了重定向之后，会定向到一些广告页面。
-
-
