@@ -49,7 +49,7 @@ def Common_json(url):
 
 以下是官网解释：https://www.python-httpx.org/compatibility/
 
- <img src="https://cthousand-pic-save.oss-cn-hangzhou.aliyuncs.com/img/202204100357928.png" style="zoom:100%;" />
+ <img src="https://cthousand-pic-save.oss-cn-hangzhou.aliyuncs.com/img/202204100357928.png" style="zoom:50%;" />
  
 
 ### 尚存在的问题
